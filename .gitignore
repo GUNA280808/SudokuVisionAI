@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+venv/
+.env
+static/uploads/*
+!static/uploads/.gitkeep
+static/outputs/*
+!static/outputs/.gitkeep
+static/pdfs/*
+!static/pdfs/.gitkeep
+database/database.db
+.DS_Store

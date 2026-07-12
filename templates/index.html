@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Home | Sudoku Vision AI{% endblock %}
+
+{% block content %}
+<div class="hero text-center mb-5">
+  <h1 class="display-5 fw-bold">AI-Powered Sudoku Vision Solver</h1>
+  <p class="lead text-secondary">
+    Upload a photo, let AI detect the puzzle, solve it instantly, analyze its difficulty,
+    and download a full PDF report.
+  </p>
+</div>
+
+<div class="row g-4 justify-content-center">
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fa-solid fa-upload me-2 text-primary"></i>Upload Image</h5>
+        <p class="text-secondary small">Accepted formats: PNG, JPG, JPEG (max 8MB)</p>
+        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+          <div class="upload-dropzone mb-3" id="dropzone">
+            <i class="fa-solid fa-cloud-arrow-up fa-2x mb-2"></i>
+            <p class="mb-1">Drag &amp; drop or click to select an image</p>
+            <input class="form-control" type="file" name="image" id="fileInput" accept=".png,.jpg,.jpeg" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100" id="uploadBtn">
+            <span class="btn-text"><i class="fa-solid fa-wand-magic-sparkles me-1"></i>Solve Sudoku</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fa-solid fa-camera me-2 text-primary"></i>Capture with Camera</h5>
+        <p class="text-secondary small">Use your webcam to snap a photo of the puzzle</p>
+        <div class="ratio ratio-4x3 bg-dark rounded mb-3 overflow-hidden">
+          <video id="video" autoplay playsinline class="w-100 h-100 object-fit-cover"></video>
+          <canvas id="canvas" class="d-none"></canvas>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-primary w-50" id="startCamera"><i class="fa-solid fa-video me-1"></i>Start</button>
+          <button class="btn btn-primary w-50" id="captureBtn" disabled><i class="fa-solid fa-camera me-1"></i>Capture &amp; Solve</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay d-none">
+  <div class="text-center text-white">
+    <div class="spinner-border mb-3" role="status"></div>
+    <p class="fs-5">Processing your Sudoku puzzle...</p>
+    <p class="small text-white-50">Detecting grid, recognizing digits, solving &amp; generating report</p>
+  </div>
+</div>
+
+{% if recent %}
+<div class="mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0"><i class="fa-solid fa-clock-rotate-left me-2"></i>Recent Solves</h4>
+    <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-secondary">View all</a>
+  </div>
+  <div class="row g-3">
+    {% for r in recent %}
+    <div class="col-md-4 col-lg-2">
+      <a href="{{ url_for('result', record_id=r.id) }}" class="text-decoration-none">
+        <div class="card h-100 history-card">
+          <img src="{{ url_for('static', filename='outputs/' + r.solved_image) }}" class="card-img-top" alt="Solved Sudoku">
+          <div class="card-body p-2">
+            <span class="badge bg-{{ 'success' if r.difficulty == 'Easy' else 'warning' if r.difficulty == 'Medium' else 'danger' if r.difficulty == 'Hard' else 'dark' }}">{{ r.difficulty }}</span>
+            <div class="small text-muted mt-1">{{ r.date }}</div>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/capture.js') }}"></script>
+{% endblock %}

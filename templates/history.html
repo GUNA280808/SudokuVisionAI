@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}History | Sudoku Vision AI{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fa-solid fa-clock-rotate-left me-2"></i>Solve History</h2>
+
+{% if records %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Image</th>
+        <th>Difficulty</th>
+        <th>Time</th>
+        <th>Status</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      <tr>
+        <td>{{ r.date }}</td>
+        <td>
+          <img src="{{ url_for('static', filename='outputs/' + r.solved_image) }}" width="50" class="rounded" alt="thumb">
+        </td>
+        <td><span class="badge bg-{{ 'success' if r.difficulty == 'Easy' else 'warning' if r.difficulty == 'Medium' else 'danger' if r.difficulty == 'Hard' else 'dark' }}">{{ r.difficulty }}</span></td>
+        <td>{{ r.processing_time }}s</td>
+        <td><span class="badge bg-secondary">{{ r.solved_status }}</span></td>
+        <td class="text-end">
+          <a href="{{ url_for('result', record_id=r.id) }}" class="btn btn-sm btn-outline-primary" title="View">
+            <i class="fa-solid fa-eye"></i>
+          </a>
+          <a href="{{ url_for('download_pdf', record_id=r.id) }}" class="btn btn-sm btn-outline-success" title="Download PDF">
+            <i class="fa-solid fa-file-pdf"></i>
+          </a>
+          <form action="{{ url_for('delete', record_id=r.id) }}" method="post" class="d-inline"
+                onsubmit="return confirm('Delete this history entry?');">
+            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+  <i class="fa-solid fa-inbox fa-3x mb-3"></i>
+  <p>No history yet. Solve your first Sudoku to see it here!</p>
+  <a href="{{ url_for('home') }}" class="btn btn-primary">Go to Home</a>
+</div>
+{% endif %}
+{% endblock %}
